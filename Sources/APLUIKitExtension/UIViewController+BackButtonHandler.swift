@@ -1,18 +1,28 @@
 //
-//  File.swift
-//  
-//
-//  Created by Ali Ebrahimi Pourasad on 01.04.20.
+// Credits:
+// https://gist.github.com/HamGuy/a099058e674b573ffe433132f7b5651e
 //
 
 import UIKit
 
-protocol NavigationControllerBackButtonDelegate {
-    // Override this method in UIViewController derived class to handle 'Back' button click
+@objc protocol NavigationControllerBackButtonDelegate {
+    
+    /// Method to handle view controller's navigaiton bar 'Back' button click.
+    /// - Returns: Boolean Indicator deciding whether the view controller should pop, when it's navigaiton bar back button is pressed.
     func shouldPopOnBackButtonPress() -> Bool
 }
 
-extension UINavigationController {
+extension UIViewController: NavigationControllerBackButtonDelegate {
+    
+    /// Override this method in derived class to handle navigaiton bar 'Back' button click. If not overritten the view controller
+    ///  defaultly pop's when the back button is pressed.
+    /// - Returns: Boolean Indicator deciding whether the view controller should pop, when it's navigaiton bar back button is pressed.
+    func shouldPopOnBackButtonPress() -> Bool {
+        return true
+    }
+}
+
+extension UINavigationController: UINavigationBarDelegate {
     
     /// Indicating wether the navigatoin bar top item can be popped. If the top item can be popped, it will also be popped.
     /// - Parameter navigationBar: Navigation bar that the item can be popped from.
@@ -25,11 +35,8 @@ extension UINavigationController {
             return true
         }
         
-        // Check if we have a view controller that wants to respond to being popped
-        var shouldPop = true
-        if let viewController = topViewController as? NavigationControllerBackButtonDelegate {
-            shouldPop = viewController.shouldPopOnBackButtonPress()
-        }
+        // Check if we have a top view controller that wants to respond to being popped.
+        let shouldPop = self.topViewController?.shouldPopOnBackButtonPress() ?? true
         
         if (shouldPop) {
             DispatchQueue.main.async {
