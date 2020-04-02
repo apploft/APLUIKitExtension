@@ -31,7 +31,7 @@ class UIColorTest: XCTestCase {
         XCTAssertEqual(testHex, redHexString)
     }
     
-    func testAdjustingColor() {
+    func testAdjustedColorNotEqualToOriginalColor() {
         //Given
         let redColor = UIColor.red
         
@@ -43,7 +43,7 @@ class UIColorTest: XCTestCase {
         XCTAssertNotEqual(adjustedColor, redColor)
     }
     
-    func testLightningColor() {
+    func testLightedColorNotEqualToOriginalColor() {
         //Given
         let redColor = UIColor.red
         
@@ -55,7 +55,7 @@ class UIColorTest: XCTestCase {
         XCTAssertNotEqual(lightenedColor, redColor)
     }
     
-    func testDarkeningColor() {
+    func testDarkedColorNotEqualToOriginalColor() {
         //Given
         let redColor = UIColor.red
         

@@ -4,7 +4,6 @@
 // MIT License · http://choosealicense.com/licenses/mit/
 
 import XCTest
-import APLUIKitExtension
 
 class UIViewControllerEmbeddingTest: XCTestCase {
 

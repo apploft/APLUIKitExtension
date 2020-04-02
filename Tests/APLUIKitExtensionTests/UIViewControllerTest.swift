@@ -4,7 +4,6 @@
 // MIT License · http://choosealicense.com/licenses/mit/
 
 import XCTest
-import APLUIKitExtension
 
 //Testing view controller's presentedViewController can not be tested inside Swift Package, since AppDelegate and root window are not accessable, and they are needed to to load view hiearchy. -> UI Test needed
 
