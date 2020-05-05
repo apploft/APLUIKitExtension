@@ -55,7 +55,8 @@ public extension UIButton {
     /// - Parameter endColor: the end color of the gradient color
     /// - Parameter forState: the state to set the color for
     func setGradientBackgroundColor(startColor: UIColor, endColor: UIColor, forState: UIControl.State) {
-        let gradientImage = UIImage.gradientImage(startColor: startColor, endColor: endColor)
+        let inset: CGFloat = 2 // stretch a two pixels wide area, UIImage.gradient creates an image wide enough
+        let gradientImage = UIImage.gradientImage(startColor: startColor, endColor: endColor).resizableImage(withCapInsets: UIEdgeInsets(top: 0, left: 0, bottom: 0, right: inset), resizingMode: .stretch)
         
         setBackgroundImage(gradientImage, for: forState)
     }
