@@ -15,7 +15,7 @@ extension UIImage {
     /// - Returns: a gradient image
     static func gradientImage(startColor: UIColor, endColor: UIColor) -> UIImage {
         let gradientLayer = CAGradientLayer()
-        let bounds = CGRect(x: 0, y: 0, width: 1.0, height: 44.0)
+        let bounds = CGRect(x: 0, y: 0, width: 4.0, height: 44.0)
         
         gradientLayer.locations = [0, 1]
         gradientLayer.startPoint = CGPoint(x: 0.5, y: 0)
