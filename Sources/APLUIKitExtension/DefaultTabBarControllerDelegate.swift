@@ -61,8 +61,8 @@ open class DefaultTabBarControllerDelegate: NSObject, UITabBarControllerDelegate
 }
 
 
-public extension UIViewController {
-   @objc func tabBarItemSelectedAgain() {
+extension UIViewController {
+   @objc open func tabBarItemSelectedAgain() {
 
     }
 }
