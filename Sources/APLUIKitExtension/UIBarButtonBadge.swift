@@ -49,6 +49,7 @@ public extension UIBarButtonItem {
     /// - Parameter color: The color of the badge. Default: red.
     /// - Parameter isFilled: Boolean indicating if the badge should be filled out. Default: true.
     /// - Parameter fontSize: The font size of the badge's text. Default: 12.
+    @available(*, deprecated, message: "Use setBadgeWithBorder instead")
     @objc func setBadge(text: String = "",
                         badgeSize: CGSize = CGSize(width: 20.0, height: 20.0),
                         badgeOrigin: CGPoint = CGPoint.zero,
@@ -87,6 +88,65 @@ public extension UIBarButtonItem {
         
         badgeShapeLayer.addSublayer(labelTextLayer)
         
+        // Save as UIBarButtonItem properties
+        objc_setAssociatedObject(self, &badgeShapeLayerAssociationKey, badgeShapeLayer, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+        objc_setAssociatedObject(self, &badgeTextLayerAssociationKey, labelTextLayer, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+    }
+
+    /// Sets a customizable badge with border of an bar button item.
+    /// The borderWidth will increase the size of the badge. A badgeSize of 20 x 20 plus a borderWidth of 2
+    /// will create a badge of the size 22 x 22.
+    /// - Parameter text: The text inside the badge. Default: empty string.
+    /// - Parameter badgeSize: The size of the badge. Default: 20 x 20
+    /// - Parameter badgeOrigin: The origin of the badge. Default: zero.
+    /// - Parameter backgroundColor: The color of the badge. Default: red.
+    /// - Parameter font: The font of the badge's text. Default: systemFont size 12.
+    /// - Parameter textColor: The font size of the badge's text. Default: black.
+    /// - Parameter borderWidth: The border width of the badge. Default: 1.
+    /// - Parameter borderColor: The border color of the badge. Default: UIColor.clear.
+    @objc func setBadgeWithBorder(text: String = "",
+                                  badgeSize: CGSize = CGSize(width: 20.0, height: 20.0),
+                                  badgeOrigin: CGPoint = CGPoint.zero,
+                                  backgroundColor: UIColor = UIColor.red,
+                                  font: UIFont = UIFont.systemFont(ofSize: 12),
+                                  textColor: UIColor = UIColor.black,
+                                  borderWidth: CGFloat = 1.0,
+                                  borderColor: UIColor = UIColor.clear) {
+        self.removeBadge()
+        if text.isEmpty {
+            return
+        }
+
+        guard let view = self.value(forKey: "view") as? UIView else { return }
+
+        let textSize = text.size(withAttributes: [NSAttributedString.Key.font: font])
+
+        // Create badge layer
+        let badgeShapeLayer = CAShapeLayer()
+        let badgeSizeWithBorder = CGSize(width: badgeSize.width + borderWidth, height: badgeSize.height + borderWidth)
+        let badgeFrame = CGRect(origin: CGPoint(x: badgeOrigin.x, y: -badgeOrigin.y), size: badgeSizeWithBorder)
+        badgeShapeLayer.strokeColor = borderColor.cgColor
+        badgeShapeLayer.fillColor = backgroundColor.cgColor
+        badgeShapeLayer.lineWidth = borderWidth
+        badgeShapeLayer.path = UIBezierPath(roundedRect: badgeFrame, cornerRadius: badgeSizeWithBorder.height / 2).cgPath
+        view.layer.addSublayer(badgeShapeLayer)
+
+        // Create label layer
+        let labelTextLayer = CATextLayer()
+        labelTextLayer.string = text
+        labelTextLayer.alignmentMode = CATextLayerAlignmentMode.center
+        labelTextLayer.font = font
+        labelTextLayer.fontSize = font.pointSize
+        labelTextLayer.foregroundColor = textColor.cgColor
+        labelTextLayer.backgroundColor = UIColor.clear.cgColor
+        labelTextLayer.contentsScale = UIScreen.main.scale
+
+        labelTextLayer.frame = CGRect(origin: CGPoint(x: badgeOrigin.x + (badgeSizeWithBorder.width-textSize.width)*0.5,
+                                                      y: -(badgeOrigin.y - (badgeSizeWithBorder.height-textSize.height)*0.5)),
+                                      size: textSize)
+
+        badgeShapeLayer.addSublayer(labelTextLayer)
+
         // Save as UIBarButtonItem properties
         objc_setAssociatedObject(self, &badgeShapeLayerAssociationKey, badgeShapeLayer, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
         objc_setAssociatedObject(self, &badgeTextLayerAssociationKey, labelTextLayer, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
