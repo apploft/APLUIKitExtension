@@ -113,7 +113,7 @@ public extension UIBarButtonItem {
                         borderWidth: CGFloat = 0.0,
                         borderColor: UIColor = UIColor.clear) {
         self.removeBadge()
-        guard text.isEmpty else {
+        guard !text.isEmpty else {
             return
         }
 
