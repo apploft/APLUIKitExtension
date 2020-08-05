@@ -49,7 +49,7 @@ public extension UIBarButtonItem {
     /// - Parameter color: The color of the badge. Default: red.
     /// - Parameter isFilled: Boolean indicating if the badge should be filled out. Default: true.
     /// - Parameter fontSize: The font size of the badge's text. Default: 12.
-    @available(*, deprecated, message: "Use setBadgeWithBorder instead")
+    @available(*, deprecated, message: "Use the new setBadge function instead")
     @objc func setBadge(text: String = "",
                         badgeSize: CGSize = CGSize(width: 20.0, height: 20.0),
                         badgeOrigin: CGPoint = CGPoint.zero,
@@ -102,18 +102,18 @@ public extension UIBarButtonItem {
     /// - Parameter backgroundColor: The color of the badge. Default: red.
     /// - Parameter font: The font of the badge's text. Default: systemFont size 12.
     /// - Parameter textColor: The font size of the badge's text. Default: black.
-    /// - Parameter borderWidth: The border width of the badge. Default: 1.
+    /// - Parameter borderWidth: The border width of the badge. Default: 0.
     /// - Parameter borderColor: The border color of the badge. Default: UIColor.clear.
-    @objc func setBadgeWithBorder(text: String = "",
-                                  badgeSize: CGSize = CGSize(width: 20.0, height: 20.0),
-                                  badgeOrigin: CGPoint = CGPoint.zero,
-                                  backgroundColor: UIColor = UIColor.red,
-                                  font: UIFont = UIFont.systemFont(ofSize: 12),
-                                  textColor: UIColor = UIColor.black,
-                                  borderWidth: CGFloat = 1.0,
-                                  borderColor: UIColor = UIColor.clear) {
+    @objc func setBadge(text: String = "",
+                        badgeSize: CGSize = CGSize(width: 20.0, height: 20.0),
+                        badgeOrigin: CGPoint = CGPoint.zero,
+                        backgroundColor: UIColor = UIColor.red,
+                        font: UIFont = UIFont.systemFont(ofSize: 12),
+                        textColor: UIColor = UIColor.black,
+                        borderWidth: CGFloat = 0.0,
+                        borderColor: UIColor = UIColor.clear) {
         self.removeBadge()
-        if text.isEmpty {
+        guard text.isEmpty else {
             return
         }
 
@@ -122,24 +122,22 @@ public extension UIBarButtonItem {
         let textSize = text.size(withAttributes: [NSAttributedString.Key.font: font])
 
         // Create badge layer
-        let badgeShapeLayer = CAShapeLayer()
         let badgeSizeWithBorder = CGSize(width: badgeSize.width + borderWidth, height: badgeSize.height + borderWidth)
         let badgeFrame = CGRect(origin: CGPoint(x: badgeOrigin.x, y: -badgeOrigin.y), size: badgeSizeWithBorder)
-        badgeShapeLayer.strokeColor = borderColor.cgColor
-        badgeShapeLayer.fillColor = backgroundColor.cgColor
-        badgeShapeLayer.lineWidth = borderWidth
-        badgeShapeLayer.path = UIBezierPath(roundedRect: badgeFrame, cornerRadius: badgeSizeWithBorder.height / 2).cgPath
+
+        let badgeShapeLayer = createBadgeShapeLayer(for: badgeFrame,
+                                                    cornerRadius: badgeSizeWithBorder.height / 2,
+                                                    borderColor: borderColor,
+                                                    fillColor: backgroundColor,
+                                                    lineWidth: borderWidth)
         view.layer.addSublayer(badgeShapeLayer)
 
         // Create label layer
-        let labelTextLayer = CATextLayer()
-        labelTextLayer.string = text
-        labelTextLayer.alignmentMode = CATextLayerAlignmentMode.center
-        labelTextLayer.font = font
-        labelTextLayer.fontSize = font.pointSize
-        labelTextLayer.foregroundColor = textColor.cgColor
-        labelTextLayer.backgroundColor = UIColor.clear.cgColor
-        labelTextLayer.contentsScale = UIScreen.main.scale
+        let labelTextLayer = createLabelTextLayer(with: text,
+                                                  alignment: .center,
+                                                  font: font,
+                                                  textColor: textColor,
+                                                  backgroundColor: backgroundColor)
 
         labelTextLayer.frame = CGRect(origin: CGPoint(x: badgeOrigin.x + (badgeSizeWithBorder.width-textSize.width)*0.5,
                                                       y: -(badgeOrigin.y - (badgeSizeWithBorder.height-textSize.height)*0.5)),
@@ -170,5 +168,38 @@ public extension UIBarButtonItem {
                                                           y: badgeTextLayer.frame.origin.y),
                                           size: textSize)
         }
+    }
+
+    //MARK:- Helpers
+
+    private func createBadgeShapeLayer(for badgeFrame: CGRect,
+                                       cornerRadius: CGFloat,
+                                       borderColor: UIColor,
+                                       fillColor: UIColor,
+                                       lineWidth: CGFloat) -> CAShapeLayer {
+        let badgeShapeLayer = CAShapeLayer()
+        badgeShapeLayer.strokeColor = borderColor.cgColor
+        badgeShapeLayer.fillColor = fillColor.cgColor
+        badgeShapeLayer.lineWidth = lineWidth
+        badgeShapeLayer.path = UIBezierPath(roundedRect: badgeFrame, cornerRadius: cornerRadius).cgPath
+
+        return badgeShapeLayer
+    }
+
+    private func createLabelTextLayer(with text: String,
+                                      alignment: CATextLayerAlignmentMode,
+                                      font: UIFont,
+                                      textColor: UIColor,
+                                      backgroundColor: UIColor) -> CATextLayer {
+        let labelTextLayer = CATextLayer()
+        labelTextLayer.string = text
+        labelTextLayer.alignmentMode = alignment
+        labelTextLayer.font = font
+        labelTextLayer.fontSize = font.pointSize
+        labelTextLayer.foregroundColor = textColor.cgColor
+        labelTextLayer.backgroundColor = UIColor.clear.cgColor
+        labelTextLayer.contentsScale = UIScreen.main.scale
+
+        return labelTextLayer
     }
 }
