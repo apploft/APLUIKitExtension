@@ -113,9 +113,8 @@ public extension UIBarButtonItem {
                         borderWidth: CGFloat = 0.0,
                         borderColor: UIColor = UIColor.clear) {
         self.removeBadge()
-        guard !text.isEmpty else {
-            return
-        }
+
+        guard !text.isEmpty else { return }
 
         guard let view = self.value(forKey: "view") as? UIView else { return }
 
